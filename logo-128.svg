@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="copperGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B87333" />
+      <stop offset="50%" stop-color="#E6B87B" />
+      <stop offset="100%" stop-color="#B87333" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="80" fill="url(#copperGradient)" filter="url(#glow)" />
+  <path d="M70,70 L130,70 L130,130 L70,130 Z" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round" />
+  <text x="100" y="110" font-family="Arial" font-size="48" font-weight="bold" fill="#FFFFFF" text-anchor="middle" filter="url(#glow)">Cu</text>
+  <path d="M60,60 L80,40 M140,60 L120,40 M60,140 L80,160 M140,140 L120,160" stroke="#E6B87B" stroke-width="3" stroke-linecap="round" />
+</svg>
