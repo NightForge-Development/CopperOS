@@ -1,11 +1,13 @@
 # To build:
 ```bash
-nasm -f bin bootloader.asm -o bootloader.bin
-gcc -ffreestanding -mno-red-zone -nostdlib -m64 -c kernel.c -o kernel.o
-ld -r -b binary logo-128.bmp -o logo.o
-ld -Ttext=0x1000 -e kernel_main --oformat binary kernel.o logo.o -o kernel.bin
+nasm -f bin boot.asm -o boot.bin
 
-cat bootloader.bin kernel.bin > os-image.bin
+x86_64-elf-gcc -ffreestanding -mcmodel=large -mno-red-zone -c kernel.c -o kernel.o
+x86_64-elf-ld -Ttext 0x10000 --oformat binary kernel.o -o kernel.bin
 
-qemu-system-x86_64 -drive format=raw,file=os-image.bin -vga std
+cat boot.bin kernel.bin > os_image.bin
+
+qemu-system-x86_64 -fda os_image.bin
+
+convert image.bmp -depth 8 -colors 256 rgb:image.raw
 ```
