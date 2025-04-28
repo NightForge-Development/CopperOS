@@ -1,7 +1,7 @@
 // kernel.c
 typedef struct {
-    unsigned long vga_buffer; // VGA buffer address
-    unsigned long reserved;   // For future use
+    unsigned long vga_buffer;
+    unsigned long reserved;
 } BootInfo;
 
 void kmain(BootInfo *boot_info) {
