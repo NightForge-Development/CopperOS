@@ -8,6 +8,7 @@ SECOND_STAGE_OFFSET equ 0x7000  ; Second stage load address
 BOOT32_OFFSET equ 0x8000        ; 32-bit stage load address
 BOOT64_OFFSET equ 0x9000        ; 64-bit stage load address
 KERNEL_OFFSET equ 0x10000       ; Kernel load address
+BOOT_INFO equ 0x500             ; Boot info structure address
 VGA_BUFFER equ 0xA0000          ; VGA memory
 
 start:
@@ -37,9 +38,17 @@ start:
     add di, 320 - 50
     loop .draw_loop
 
+    ; Set up boot info structure
+    mov di, BO큼
+
+    mov eax, VGA_BUFFER
+    mov [di], eax       ; Store VGA buffer address
+    xor eax, eax
+    mov [di + 4], eax   ; Reserved for future use
+
     ; Load second stage, boot32, boot64, and kernel
     mov ah, 0x02        ; BIOS read sector
-    mov al, 32          ; Sectors to read (adjust as needed)
+    mov al, 32          ; Sectors to read
     mov ch, 0
     mov cl, 2           ; Start from sector 2
     mov dh, 0
