@@ -4,11 +4,11 @@
 [org 0x7C00]
 
 ; Constants
-BOOT32_OFFSET equ 0x8000    ; 32-bit stage load address
-BOOT64_OFFSET equ 0x9000    ; 64-bit stage load address
-SECOND_STAGE_OFFSET equ 0xA000 ; Second stage load address
-KERNEL_OFFSET equ 0x10000   ; Kernel load address
-VGA_BUFFER equ 0xA0000      ; VGA memory
+SECOND_STAGE_OFFSET equ 0x7000  ; Second stage load address
+BOOT32_OFFSET equ 0x8000        ; 32-bit stage load address
+BOOT64_OFFSET equ 0x9000        ; 64-bit stage load address
+KERNEL_OFFSET equ 0x10000       ; Kernel load address
+VGA_BUFFER equ 0xA0000          ; VGA memory
 
 start:
     ; Initialize registers and stack
@@ -37,20 +37,20 @@ start:
     add di, 320 - 50
     loop .draw_loop
 
-    ; Load boot32, boot64, second stage, and kernel
+    ; Load second stage, boot32, boot64, and kernel
     mov ah, 0x02        ; BIOS read sector
     mov al, 32          ; Sectors to read (adjust as needed)
     mov ch, 0
     mov cl, 2           ; Start from sector 2
     mov dh, 0
     mov dl, 0x80        ; Boot drive
-    mov bx, BOOT32_OFFSET
+    mov bx, SECOND_STAGE_OFFSET
     mov es, bx
     xor bx, bx
     int 0x13
     jc .disk_error
 
-    ; Call second stage to load image
+    ; Call second stage to display full image
     call SECOND_STAGE_OFFSET
 
     ; Switch to protected mode
