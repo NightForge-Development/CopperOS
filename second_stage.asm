@@ -4,7 +4,7 @@
 [org 0x7000]
 
 start:
-    mov ax, 0xA000      ; VGA buffer
+    mov ax, 0xA000
     mov es, ax
     xor di, di
     mov si, image_data
