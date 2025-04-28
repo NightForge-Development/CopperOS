@@ -5,6 +5,12 @@
 
 // Extern from bootloader
 extern uint64_t framebuffer_addr;
+__attribute__((weak)) uint64_t framebuffer_addr = 0;  // Provide default definition for linker
+
+// Extern from BMP
+extern uint8_t _binary_logo_128_bmp_start;
+extern uint8_t _binary_logo_128_bmp_end;
+extern uint8_t _binary_logo_128_bmp_size;
 
 typedef struct {
     uint16_t type;              // Magic identifier: 0x4d42 ("BM")
@@ -30,8 +36,8 @@ void draw_pixel(uint32_t* fb, uint32_t x, uint32_t y, uint32_t color) {
 }
 
 // We'll embed the BMP directly into memory
-extern uint8_t _binary_image_bmp_start;
-extern uint8_t _binary_image_bmp_end;
+extern uint8_t _binary_logo_128_bmp_start;
+extern uint8_t _binary_logo_128_bmp_end;
 
 void kernel_main(void) {
     uint32_t* fb = (uint32_t*)(uintptr_t)framebuffer_addr;
@@ -42,8 +48,8 @@ void kernel_main(void) {
             draw_pixel(fb, x, y, 0x00000000);
 
     // Load BMP
-    BMPHeader* bmp = (BMPHeader*)&_binary_image_bmp_start;
-    uint8_t* pixel_data = &_binary_image_bmp_start + bmp->offset;
+    BMPHeader* bmp = (BMPHeader*)&_binary_logo_128_bmp_start;
+    uint8_t* pixel_data = &_binary_logo_128_bmp_start + bmp->offset;
 
     for (uint32_t y = 0; y < bmp->height; ++y) {
         for (uint32_t x = 0; x < bmp->width; ++x) {
