@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Check for required tools
+command -v nasm >/dev/null 2>&1 || { echo "Error: nasm is required"; exit 1; }
+command -v x86_64-elf-gcc >/dev/null 2>&1 || { echo "Error: x86_64-elf-gcc is required"; exit 1; }
+command -v x86_64-elf-ld >/dev/null 2>&1 || { echo "Error: x86_64-elf-ld is required"; exit 1; }
+command -v qemu-system-x86_64 >/dev/null 2>&1 || { echo "Error: qemu-system-x86_64 is required"; exit 1; }
+command -v convert >/dev/null 2>&1 || { echo "Error: ImageMagick (convert) is required"; exit 1; }
+
+# Create a sample 320x200 BMP image if not provided
+if [ ! -f image.bmp ]; then
+    convert -size 320x200 xc:white -fill blue -draw "rectangle 50,50,270,150" image.bmp
+fi
+convert image.bmp -depth 8 -colors 256 rgb:image.raw
+
 # Assemble bootloader stages
 nasm -f bin boot.asm -o boot.bin
 nasm -f bin boot32.asm -o boot32.bin
