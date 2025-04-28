@@ -37,7 +37,7 @@ start:
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x7C00
+    mov    mov sp, 0x7C00
 
     mov ah, 0x00
     mov al, 0x13
