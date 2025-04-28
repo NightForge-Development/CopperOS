@@ -5,6 +5,7 @@
 
 ; Constants
 KERNEL_OFFSET equ 0x10000
+BOOT_INFO equ 0x500
 
 start_long_mode:
     ; Update segment registers
@@ -15,6 +16,9 @@ start_long_mode:
     mov gs, ax
     mov ss, ax
     mov rsp, 0x7FFFF
+
+    ; Pass boot info address in rdi
+    mov rdi, BOOT_INFO
 
     ; Jump to kernel
     mov rax, KERNEL_OFFSET
