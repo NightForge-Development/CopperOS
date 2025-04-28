@@ -10,15 +10,11 @@
 #    # Install Homebrew if not already installed
 #    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 #    # Install required dependencies
-#    brew install nasm gcc binutils qemu
-#    # Optional: Install ImageMagick for custom images
-#    brew install imagemagick
+#    brew install nasm gcc binutils qemu imagemagick
 #    Note: Ensure gcc and ld support x86-64 bare-metal compilation.
 #    If issues arise, consider installing a cross-compiler (e.g., x86_64-elf-gcc/ld): https://wiki.osdev.org/GCC_Cross-Compiler
-# 2. Save this script as `build_bootloader.sh`.
-# 3. Make executable: chmod +x build_bootloader.sh
-# 4. Run: ./build_bootloader.sh
-# 5. Optionally provide a 320x200 BMP image as `image.bmp` in the same directory.
+# 2. Make executable: chmod +x build_bootloader.sh
+# 3. Run: ./build_bootloader.sh
 
 # Check for required tools
 command -v nasm >/dev/null 2>&1 || { echo "Error: nasm is required"; exit 1; }
