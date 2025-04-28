@@ -1,5 +1,4 @@
 # To build:
----
 ```bash
 nasm -f bin bootloader.asm -o bootloader.bin
 x86_64-elf-gcc -ffreestanding -mno-red-zone -nostdlib -m64 -c kernel.c -o kernel.o
