@@ -63,17 +63,15 @@ jobs:
           cat boot.bin second_stage.bin boot32.bin boot64.bin kernel.bin > os_image.bin
 
       - name: Github Actions Create Release
-        uses: Hs1r1us/Release-AIO@v2.0.0
+        uses: stacksjs/action-releaser@v0.0.1
         with:
           token: ${{ secrets.UPLOAD_TOKEN }}
           # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
-          tag_name: ${{ steps.version.outputs.tag_name }}
-          # The name of the release. For example, `Release v1.0.1`
-          release_name: ${{ steps.version.outputs.version_name }}
+          tag: ${{ steps.version.outputs.tag_name }}
           # Text describing the contents of the tag.
-          body: "Release made by GitHub Actions..."
+          note: "Release made by GitHub Actions..."
           # Assets to be uploaded to the Release
-          asset_files: "os_image.bin"
+          files: "os_image.bin"
         env:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.UPLOAD_TOKEN }}
