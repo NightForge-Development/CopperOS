@@ -13,12 +13,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important: get full history for merge-base
 
       - name: Check for relevant changes
         id: changes
         run: |
           git fetch origin stable
-          CHANGED=$(git diff --name-only HEAD HEAD~1 | grep -E 'boot.*\.asm|second_stage\.asm|kernel\.c|linker\.ld' || true)
+          BASE=$(git merge-base HEAD origin/stable)
+          CHANGED=$(git diff --name-only $BASE HEAD | grep -E 'boot.*\.asm|second_stage\.asm|kernel\.c|linker\.ld' || true)
           if [ -z "$CHANGED" ]; then
             echo "no_changes=true" >> $GITHUB_OUTPUT
           else
