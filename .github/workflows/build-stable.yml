@@ -17,7 +17,7 @@ jobs:
       - name: Check for relevant changes
         id: changes
         run: |
-          git fetch origin main
+          git fetch origin stable
           CHANGED=$(git diff --name-only HEAD HEAD~1 | grep -E 'boot.*\.asm|second_stage\.asm|kernel\.c|linker\.ld' || true)
           if [ -z "$CHANGED" ]; then
             echo "no_changes=true" >> $GITHUB_OUTPUT
