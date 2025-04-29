@@ -17,13 +17,11 @@ jobs:
           fetch-depth: 0  # Important: get full history for merge-base
 
       - name: Install dependencies
-        if: steps.changes.outputs.no_changes == 'false'
         run: |
           sudo apt update
           sudo apt install -y nasm gcc make curl jq
 
       - name: Get latest release and compute next version
-        if: steps.changes.outputs.no_changes == 'false'
         id: version
         run: |
           LATEST=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
@@ -55,7 +53,6 @@ jobs:
           echo "version_name=$NAME" >> $GITHUB_OUTPUT
 
       - name: Build OS image
-        if: steps.changes.outputs.no_changes == 'false'
         run: |
           nasm -f bin boot.asm -o boot.bin
           nasm -f bin boot32.asm -o boot32.bin
@@ -66,7 +63,6 @@ jobs:
           cat boot.bin second_stage.bin boot32.bin boot64.bin kernel.bin > os_image.bin
 
       - name: Upload to GitHub Release
-        if: steps.changes.outputs.no_changes == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag_name }}
