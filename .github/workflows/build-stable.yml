@@ -63,15 +63,27 @@ jobs:
           cat boot.bin second_stage.bin boot32.bin boot64.bin kernel.bin > os_image.bin
 
       - name: Github Actions Create Release
-        uses: stacksjs/action-releaser@v0.0.1
+        uses: idev-coder/github-actions-release@v1.0.0
         with:
-          token: ${{ secrets.UPLOAD_TOKEN }}
+          github_token: ${{ secrets.UPLOAD_TOKEN }}
           # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
           tag: ${{ steps.version.outputs.tag_name }}
           # Text describing the contents of the tag.
-          note: "Release made by GitHub Actions..."
-          # Assets to be uploaded to the Release
-          files: "os_image.bin"
+          body: "Release made by GitHub Actions..."
+          name: ${{ steps.version.outputs.version_name }}
         env:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.UPLOAD_TOKEN }}
+
+      - name: Publish Release Assets
+        uses: vinayaja/publish-release-assets@v1.1.0
+        with:
+          # Github Token or Pat Token
+          gh-token: ${{ secrets.UPLOAD_TOKEN }}
+          # Release Tag
+          release-tag: ${{ steps.version.outputs.tag_name }}
+          # asset names, for multiple names use , seperated values
+          asset-names: "os_image.bin"
+          # overwrite, default is false
+          overwrite: false
+          
