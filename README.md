@@ -1,6 +1,7 @@
 # Installing
 ## Download the latest release from GitHub Releases
-
+> Note:
+> As of right now, the OS only functions when running in qemu, and only displays a red square (That is intentional.)
 # To Build:
 ## 1. Install dependencies on Ubuntu/Debian:
 ### Install Dependencies
