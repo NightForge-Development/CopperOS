@@ -16,18 +16,6 @@ jobs:
         with:
           fetch-depth: 0  # Important: get full history for merge-base
 
-      - name: Check for relevant changes
-        id: changes
-        run: |
-          git fetch origin stable
-          BASE=$(git merge-base HEAD origin/stable)
-          CHANGED=$(git diff --name-only $BASE HEAD | grep -E 'boot.*\.asm|second_stage\.asm|kernel\.c|linker\.ld' || true)
-          if [ -z "$CHANGED" ]; then
-            echo "no_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "no_changes=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Install dependencies
         if: steps.changes.outputs.no_changes == 'false'
         run: |
