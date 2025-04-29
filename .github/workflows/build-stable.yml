@@ -58,8 +58,8 @@ jobs:
           nasm -f bin boot32.asm -o boot32.bin
           nasm -f bin boot64.asm -o boot64.bin
           nasm -f bin second_stage.asm -o second_stage.bin
-          gcc -ffreestanding -mcmodel=large -mno-red-zone -m64 -c kernel.c -o kernel.o
-          ld -T linker.ld kernel.o -o kernel.bin
+          gcc -ffreestanding -mcmodel=large -mno-red-zone -m64 -c kernel.c -o kernel.o -fno-pie -no-pie
+          ld -T linker.ld -nostdlib kernel.o -o kernel.bin
           cat boot.bin second_stage.bin boot32.bin boot64.bin kernel.bin > os_image.bin
 
       - name: Upload to GitHub Release
