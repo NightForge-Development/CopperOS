@@ -1,0 +1,85 @@
+name: Build OS Image
+
+on:
+  schedule:
+    - cron: '0 0 */14 * *'  # Every 2 weeks
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for relevant changes
+        id: changes
+        run: |
+          git fetch origin main
+          CHANGED=$(git diff --name-only HEAD HEAD~1 | grep -E 'boot.*\.asm|second_stage\.asm|kernel\.c|linker\.ld' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        if: steps.changes.outputs.no_changes == 'false'
+        run: |
+          sudo apt update
+          sudo apt install -y nasm gcc make curl jq
+
+      - name: Get latest release and compute next version
+        if: steps.changes.outputs.no_changes == 'false'
+        id: version
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "Latest release tag: $LATEST"
+          
+          if [[ "$LATEST" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+          else
+            MAJOR=0; MINOR=0; PATCH=0
+          fi
+
+          PATCH=$((PATCH + 1))
+          if [ $PATCH -ge 10 ]; then
+            PATCH=0
+            MINOR=$((MINOR + 1))
+          fi
+
+          if [ $MINOR -ge 10 ]; then
+            MINOR=0
+            MAJOR=$((MAJOR + 1))
+          fi
+
+          VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          NAME="CopperOS - ${VERSION}"
+          echo "Next version: $VERSION"
+          echo "tag_name=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_name=$NAME" >> $GITHUB_OUTPUT
+
+      - name: Build OS image
+        if: steps.changes.outputs.no_changes == 'false'
+        run: |
+          nasm -f bin boot.asm -o boot.bin
+          nasm -f bin boot32.asm -o boot32.bin
+          nasm -f bin boot64.asm -o boot64.bin
+          nasm -f bin second_stage.asm -o second_stage.bin
+          gcc -ffreestanding -mcmodel=large -mno-red-zone -m64 -c kernel.c -o kernel.o
+          ld -T linker.ld kernel.o -o kernel.bin
+          cat boot.bin second_stage.bin boot32.bin boot64.bin kernel.bin > os_image.bin
+
+      - name: Upload to GitHub Release
+        if: steps.changes.outputs.no_changes == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          name: ${{ steps.version.outputs.version_name }}
+          files: os_image.bin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
