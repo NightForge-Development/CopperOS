@@ -1,3 +1,4 @@
+/* This is adjusted to only keep info that is needed by the kernel or assembly for compiling and running the OS */
 ENTRY(kmain)                /* Ensures your entry point (_start) is kept */
 OUTPUT_FORMAT(binary)        /* Raw binary output (no ELF/PE/etc.) */
 
