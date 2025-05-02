@@ -7,6 +7,10 @@ start:
     mov ax, 0xA000
     mov es, ax
     xor di, di
+    mov si, image_data
     mov cx, 320*200
     rep movsb
     ret
+
+image_data:
+    incbin "image.raw"
