@@ -44,7 +44,25 @@ jobs:
         if: steps.check-commits.outputs.has_new_commits == 'true'
         run: |
           sudo apt update
-          sudo apt install -y nasm gcc make curl jq
+          sudo apt install -y nasm gcc binutils qemu-system-x86_64 imagemagick curl jq
+
+      - name: Convert logo-128.bmp to image.raw
+        if: steps.check-commits.outputs.has_new_commits == 'true'
+        run: |
+          if [ -f logo-128.bmp ]; then
+            convert logo-128.bmp -resize 320x200 -depth 8 -colors 256 rgb:image.raw
+            # Verify image size
+            size=$(wc -c < image.raw)
+            if [ "$size" -ne 64000 ]; then
+              echo "Error: image.raw is not 64000 bytes (is $size bytes)"
+              exit 1
+            fi
+          else
+            echo "Warning: logo-128.bmp not found. Creating placeholder image.raw."
+            # Create a placeholder image.raw (black with blue rectangle)
+            dd if=/dev/zero of=image.raw bs=1 count=64000 2>/dev/null
+            printf '\x01' | dd of=image.raw bs=1 seek=32100 count=50 conv=notrunc 2>/dev/null
+          fi
 
       - name: Get latest release and compute next version
         if: steps.check-commits.outputs.has_new_commits == 'true'
@@ -94,24 +112,17 @@ jobs:
         uses: idev-coder/github-actions-release@v1.0.0
         with:
           github_token: ${{ secrets.UPLOAD_TOKEN }}
-          # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
           tag: ${{ steps.version.outputs.tag_name }}
-          # Text describing the contents of the tag.
           body: "Release made by GitHub Actions..."
           name: ${{ steps.version.outputs.version_name }}
         env:
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.UPLOAD_TOKEN }}
 
       - name: Publish Release Assets
         if: steps.check-commits.outputs.has_new_commits == 'true'
         uses: vinayaja/publish-release-assets@v1.1.0
         with:
-          # Github Token or Pat Token
           gh-token: ${{ secrets.UPLOAD_TOKEN }}
-          # Release Tag
           release-tag: ${{ steps.version.outputs.tag_name }}
-          # asset names, for multiple names use , seperated values
-          asset-names: "os_image.bin"
-          # overwrite, default is false
+          asset-names: "os_image.bin,image.raw"
           overwrite: false
