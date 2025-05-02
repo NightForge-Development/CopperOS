@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.UPLOAD_TOKEN }}
 
       - name: Install ImageMagick
         run: |
@@ -36,8 +38,12 @@ jobs:
             printf '\x01' | dd of=image.raw bs=1 seek=32100 count=50 conv=notrunc 2>/dev/null
           fi
 
-      - name: Upload image.raw as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: image-raw
-          path: image.raw
+      - name: Commit and push image.raw
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add image.raw
+          git diff --staged --quiet || git commit -m "Update image.raw from logo-128.bmp"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.UPLOAD_TOKEN }}
