@@ -44,25 +44,7 @@ jobs:
         if: steps.check-commits.outputs.has_new_commits == 'true'
         run: |
           sudo apt update
-          sudo apt install -y nasm gcc binutils qemu-system-x86_64 imagemagick curl jq
-
-      - name: Convert logo-128.bmp to image.raw
-        if: steps.check-commits.outputs.has_new_commits == 'true'
-        run: |
-          if [ -f logo-128.bmp ]; then
-            convert logo-128.bmp -resize 320x200 -depth 8 -colors 256 rgb:image.raw
-            # Verify image size
-            size=$(wc -c < image.raw)
-            if [ "$size" -ne 64000 ]; then
-              echo "Error: image.raw is not 64000 bytes (is $size bytes)"
-              exit 1
-            fi
-          else
-            echo "Warning: logo-128.bmp not found. Creating placeholder image.raw."
-            # Create a placeholder image.raw (black with blue rectangle)
-            dd if=/dev/zero of=image.raw bs=1 count=64000 2>/dev/null
-            printf '\x01' | dd of=image.raw bs=1 seek=32100 count=50 conv=notrunc 2>/dev/null
-          fi
+          sudo apt install -y nasm
 
       - name: Get latest release and compute next version
         if: steps.check-commits.outputs.has_new_commits == 'true'
