@@ -1,0 +1,43 @@
+name: Convert Logo to Image Raw
+
+on:
+  push:
+    paths:
+      - 'logo-128.bmp'
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt update
+          sudo apt install -y imagemagick
+
+      - name: Convert logo-128.bmp to image.raw
+        run: |
+          if [ -f logo-128.bmp ]; then
+            convert logo-128.bmp -resize 320x200 -depth 8 -colors 256 rgb:image.raw
+            # Verify image size
+            size=$(wc -c < image.raw)
+            if [ "$size" -ne 64000 ]; then
+              echo "Error: image.raw is not 64000 bytes (is $size bytes)"
+              exit 1
+            fi
+          else
+            echo "Warning: logo-128.bmp not found. Creating placeholder image.raw."
+            # Create a placeholder image.raw (black with blue rectangle)
+            dd if=/dev/zero of=image.raw bs=1 count=64000 2>/dev/null
+            printf '\x01' | dd of=image.raw bs=1 seek=32100 count=50 conv=notrunc 2>/dev/null
+          fi
+
+      - name: Upload image.raw as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-raw
+          path: image.raw
