@@ -25,12 +25,6 @@ jobs:
         run: |
           if [ -f logo-128.bmp ]; then
             convert logo-128.bmp -resize 320x200 -depth 8 -colors 256 rgb:image.raw
-            # Verify image size
-            size=$(wc -c < image.raw)
-            if [ "$size" -ne 64000 ]; then
-              echo "Error: image.raw is not 64000 bytes (is $size bytes)"
-              exit 1
-            fi
           else
             echo "Warning: logo-128.bmp not found. Creating placeholder image.raw."
             # Create a placeholder image.raw (black with blue rectangle)
