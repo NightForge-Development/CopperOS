@@ -1,9 +1,6 @@
 name: Convert Logo to Image Raw
 
 on:
-  push:
-    paths:
-      - 'logo-128.bmp'
   workflow_dispatch:
 
 jobs:
