@@ -120,5 +120,5 @@ jobs:
           image: "https://raw.githubusercontent.com/NightForge-Development/CopperOS/refs/heads/stable/check-mark.png"
           color: 16749824
           url: "https://github.com/NightForge-Development/CopperOS/releases/tag/${{ steps.version.outputs.tag_name }}"
-          username: CopperOS Build Status
+          username: CopperOS Releases
           avatar_url: ${{ secrets.AVATAR_URL }}
