@@ -106,5 +106,19 @@ jobs:
         with:
           gh-token: ${{ secrets.UPLOAD_TOKEN }}
           release-tag: ${{ steps.version.outputs.tag_name }}
-          asset-names: "os_image.bin,image.raw"
+          asset-names: "os_image.bin"
           overwrite: false
+        
+      - uses: sarisia/actions-status-discord@v1
+        if: steps.check-commits.outputs.has_new_commits == 'true'
+        with:
+          webhook: ${{ secrets.COPPEROS_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          content: "Hey @everyone! New Release!"
+          title: "Build New Release"
+          description: "`CopperOS ${{ steps.version.outputs.tag_name }}` available [Here](https://github.com/NightForge-Development/CopperOS/releases/tag/${{ steps.version.outputs.tag_name }})!"
+          image: "https://raw.githubusercontent.com/NightForge-Development/CopperOS/refs/heads/stable/check-mark.png"
+          color: 16749824
+          url: "https://github.com/NightForge-Development/CopperOS/releases/tag/${{ steps.version.outputs.tag_name }}"
+          username: CopperOS Build Status
+          avatar_url: ${{ secrets.AVATAR_URL }}
